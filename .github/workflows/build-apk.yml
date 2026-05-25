@@ -2,14 +2,24 @@ name: Build APK
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout olcbox
         uses: actions/checkout@v4
+        with:
+          path: olcbox
+
+      - name: Checkout olcrtc
+        uses: actions/checkout@v4
+        with:
+          repository: alananisimov/olcrtc
+          path: olcrtc
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -18,14 +28,15 @@ jobs:
           java-version: 17
 
       - name: Grant execute permission
+        working-directory: olcbox
         run: chmod +x gradlew
 
       - name: Build APK
+        working-directory: olcbox
         run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: |
-            **/*.apk
+          path: olcbox/**/*.apk
